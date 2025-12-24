@@ -60,7 +60,7 @@ def parse_args():
 
 
 class myDataset(data.Dataset):
-    """定义数据集"""
+
     def __init__(self, snp, Data_Env, otherData, yy):
         self.snp = torch.as_tensor(snp)
         self.Data_Env = torch.as_tensor(Data_Env)
@@ -76,14 +76,13 @@ class myDataset(data.Dataset):
 
 
 def main():
-    args = parse_args()  # 解析命令行参数
+    args = parse_args()  
     print(args)
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}", flush=True)
     
-    setup_seed(0)  # 设置随机种子
+    setup_seed(0)  
 
-    # 加载数据
     snpALL = pd.read_csv("./Data_G/507like976_15w_trans.txt")
     print(snpALL)
 
@@ -122,7 +121,6 @@ def main():
         trainid = train.tolist()
         valid = test.tolist()
 
-        # 训练集和验证集
         trainsnp = snp.iloc[trainid].reset_index(drop=True)
 
         trainsnpTensor = torch.tensor(trainsnp.values, dtype=torch.float)
@@ -133,7 +131,7 @@ def main():
         valsnpTensor = torch.tensor(valsnp.values, dtype=torch.float)
         valyy = yy.iloc[valid].reset_index(drop=True)
         valset = myDataset(valsnpTensor, envTensor,otherTensor,valyy)
-        # 数据加载器
+
         train_loader = data.DataLoader(
             dataset=trainset,
             batch_size=args.batch,
@@ -144,10 +142,10 @@ def main():
             dataset=valset,
             batch_size=args.batch,
             num_workers=2,
-            shuffle=True
+            shuffle=False
         )
 
-        # 初始化模型
+        
         net = RWKV_GP(args, snp_len=152864,envday=150).to(device)
         optimizer = optim.Adam(net.parameters(), lr=args.lr)
         loss_func = nn.SmoothL1Loss()
@@ -174,7 +172,6 @@ def main():
             train_pred_epoch = []
             train_exp_epoch = []
 
-            # 训练阶段
             for i, (tsnp, Data_Env, otherData, tyy, tMa) in enumerate(train_loader, 0):
                 
                 tsnp = tsnp.to(device)
@@ -201,7 +198,6 @@ def main():
             train_pc_v_all.append(pc[1])
             train_loss_all.append(train_loss / len(train_loader))
 
-            # 验证阶段
             net.eval()
             val_loss = 0.0
             test_pred_epoch = []
@@ -244,7 +240,6 @@ def main():
             print(f"epoch:{epoch}  Consumed Time: {consumed_time:.1f} seconds", flush=True)
             starttime = endtime
 
-        # 保存结果
         save_path = f'./result_507_{args.model_id}/{args.phe}/{dataLoad_path}_result'
         if not os.path.exists(save_path):
             os.makedirs(save_path)
