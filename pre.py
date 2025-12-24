@@ -66,7 +66,7 @@ for version in ['MO17','ZHENG58']:
             envTensor=torch.tensor(envData.values,dtype=torch.float)
             otherTensor=torch.tensor(otherData.values,dtype=torch.float)
             
-            # 制作数据集
+           
             trainsnp=snp.reset_index(drop=True)
             trainsnpTensor=torch.tensor(trainsnp.values, dtype=torch.float)
             
@@ -82,7 +82,7 @@ for version in ['MO17','ZHENG58']:
             save_path=f'./result_Pre_RWKV_GP/{version}/{sample}/{dataLoad_path}_result'
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
-            # 选一个最好的模型进行
+         
             
             best_per=-1
             
@@ -102,7 +102,7 @@ for version in ['MO17','ZHENG58']:
                     besti=i
             
             
-            # 最好的模型
+         
             pthfile =  f'./result_507_RWKV_GP/{sample}/{env}_{sample}_result/bestnet{besti}.pkl'
 
             # net = torch.load(pthfile, map_location='cpu')
@@ -110,7 +110,7 @@ for version in ['MO17','ZHENG58']:
 
             net.eval()
             
-            # 进行预测
+        
             pred_epoch = []
             exp_epoch = []
 
